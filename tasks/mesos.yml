@@ -50,11 +50,11 @@
   when: (mesos_install_mode == "slave" or mesos_install_mode == "master-slave") and etc_init.stat.exists == true
   notify:
     - Restart mesos-slave
-    
+
 - name: Check if systemd exists
   stat: path=/usr/lib/systemd/system/
   register: systemd_check
-  
+
 - name: Mesos master systemd script
   template: src=mesos-master.service.j2 dest=/usr/lib/systemd/system/mesos-master.service
   when: (mesos_install_mode == "master" or mesos_install_mode == "master-slave") and systemd_check.stat.exists == true
@@ -71,8 +71,12 @@
 
 - name: Disable mesos-master service
   service: name=mesos-master enabled=no
-  when: mesos_install_mode == "slave" and systemd_check.stat.exists == true
+  when: mesos_install_mode == "slave"
 
 - name: Disable mesos-slave service
   service: name=mesos-slave enabled=no
-  when: mesos_install_mode == "master" and systemd_check.stat.exists == true
+  when: mesos_install_mode == "master"
+
+- name: Disable zookeeper service
+  service: name=zookeeper enabled=no state=stopped
+  when: mesos_install_mode == "slave" or mesos_external_zookeeper

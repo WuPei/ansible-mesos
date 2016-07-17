@@ -9,4 +9,6 @@ description "mesos master"
 start on stopped rc RUNLEVEL=[2345]
 respawn
 
+setuid {{ mesos_owner }}
+setgid {{ mesos_group }}
 exec /usr/bin/mesos-init-wrapper master
